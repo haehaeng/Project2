@@ -25,4 +25,4 @@ class My_plane{
         int check_frame_my_plane=0;
         vector<Bullet> bullet;
 };
-#endif
+#endif  
