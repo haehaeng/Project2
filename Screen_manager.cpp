@@ -113,9 +113,11 @@ void Screen_manager::print_share(){
         
             //items
             case 'P':{
+                num_event_occured++;
                 break;
             }
             case 'L':{
+                num_event_occured++;
                 break;
             }
     }
