@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
     manager.print();
     manager.render();
 
+
     int ch = 0;
     while(ch !='x')
     {
@@ -62,6 +63,13 @@ int main(int argc, char *argv[])
             ch = getKeyDown();
             manager.print(ch);
             if(ch=='x') break;
+            //pause part
+            if(ch=='p'){
+                while(1){
+                    if(_kbhit()) break;
+                }
+            }
+            //pause part ends
         }
         else{
             manager.print();
