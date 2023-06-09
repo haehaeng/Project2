@@ -15,7 +15,7 @@
     int create_frame_enemy; //initialize when it creates
     int check_frame_enemy = 0;
     
-    char content;
+    char content = 'O';
 
     private:
  

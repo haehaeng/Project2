@@ -7,7 +7,7 @@ class enemy_3s: public enemy
 {
     public:
     enemy_3s(int y_value, int x_value, int frame_value):enemy(y_value, x_value, frame_value, 4, 9, 3) {}
-    char contetn = 's';
+    char content = 's';
 
     private:
     
