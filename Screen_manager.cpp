@@ -8,12 +8,14 @@
 #include <conio.h>
 #include <chrono>
 #include <vector>
-#include "Screen_manager.h"
+#include "enemy.h"
 #include "enemy_1n.h"
 #include "enemy_2r.h"
 #include "enemy_3s.h"
 #include "enemy_4d.h"
 #include "enemy_5a.h"
+#include "Screen_manager.h"
+
 using namespace std;
 
 //move cursor
@@ -71,46 +73,60 @@ void Screen_manager::print_share(){
     }
     //Bullet part ends
     }
+
     //Events Generation part
     {
     while ( frame_event[num_event_occured] <= curr_frame)
     {
         switch(type_event[num_event_occured]){
             //enemies
-            case 'n':
+            case 'n':{
                 enemy_1n* enemy_1 = new enemy_1n(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_1);
+                num_event_occured++;
                 break;
-            case 'r':
+            }
+            case 'r':{
                 enemy_2r* enemy_2 = new enemy_2r(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_2);
+                num_event_occured++;
                 break;
-            case 's':
+            }
+            case 's':{
                 enemy_3s* enemy_3 = new enemy_3s(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_3);
+                num_event_occured++;
                 break;
-            case 'd':
+            }
+            case 'd':{
                 enemy_4d* enemy_4 = new enemy_4d(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_4);
+                num_event_occured++;
                 break;
-            case 'a':
+            }
+            case 'a':{
                 enemy_5a* enemy_5 = new enemy_5a(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_5);
+                num_event_occured++;
                 break;
+            }
         
             //items
-            case 'P':
+            case 'P':{
                 break;
-            case 'L':
+            }
+            case 'L':{
                 break;
+            }
     }
 
     }
+
     //Each event is stored in proper vector.
     //Envents Generation part ends
     }
     //Enemy printing part
-    for (auto iter=enemies.begin(); iter<enemies.end();)
+    for (auto iter=enemies.begin(); iter!=enemies.end();)
     {
         if((**iter).x <= 0)
         {
@@ -119,9 +135,9 @@ void Screen_manager::print_share(){
         }
         else{
             board[(**iter).y][(**iter).x]=(**iter).content;
+            iter++;
         }
     }
-
     //Enemy part ends
 
 
