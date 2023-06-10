@@ -53,16 +53,33 @@ void Screen_manager::print_share(){
     }
 
     //Bullet part
-    {
+
     int shot_frame, create_frame, check_frame;
     shot_frame = this->my_plane.shot_frame_my_plane;
     create_frame = this->my_plane.create_frame_my_plane;
     check_frame = this->my_plane.check_frame_my_plane;
+    
     while ((curr_frame-create_frame)/shot_frame - check_frame > 0){ //bullet create
         Bullet bullet = Bullet(this->my_plane.y-1+shot_frame, this->my_plane.x, check_frame);
         bullet.level = my_plane.level;
         bullet.power = my_plane.power;
         this->my_plane.bullet.push_back(bullet);
+
+        if(bullet.power){
+            if(my_plane.x>1){
+                Bullet bullet = Bullet(this->my_plane.y-1+shot_frame, this->my_plane.x-1, check_frame);
+                bullet.level = my_plane.level;
+                bullet.power = my_plane.power;
+                this->my_plane.bullet.push_back(bullet);
+            }
+            if(my_plane.x<58){
+                Bullet bullet = Bullet(this->my_plane.y-1+shot_frame, this->my_plane.x+1, check_frame);
+                bullet.level = my_plane.level;
+                bullet.power = my_plane.power;
+                this->my_plane.bullet.push_back(bullet);
+            }
+
+        }
 
         for(auto iter=this->my_plane.bullet.begin(); iter<this->my_plane.bullet.end(); ){
             
@@ -78,45 +95,14 @@ void Screen_manager::print_share(){
                 board[iter->y][iter->x]=iter->get_symbol();
                 iter++;
             }
-            /*
-            if(iter->power){
-                if(my_plane.x>1){
-                    if(iter->y<=0){
-                    board[iter->y][iter->x-1]=' ';
-                    this->my_plane.bullet.erase(iter);
-                }
-                else{
-                    if(iter!=(this->my_plane.bullet.end()-1) && curr_frame!=1){
-                        board[iter->y][iter->x-1]=' ';
-                    }
-                    iter->y -= shot_frame;
-                    board[iter->y][iter->x-1]=iter->get_symbol();
-                    iter++;
-                }
-                }
-                if(my_plane.x<30){
-                    if(iter->y<=0){
-                    board[iter->y][iter->x+1]=' ';
-                    this->my_plane.bullet.erase(iter);
-                }
-                else{
-                    if(iter!=(this->my_plane.bullet.end()-1) && curr_frame!=1){
-                        board[iter->y][iter->x+1]=' ';
-                    }
-                    iter->y -= shot_frame;
-                    board[iter->y][iter->x+1]=iter->get_symbol();
-                    iter++;
-                }
-                }
-                
-            }
-            */
         }
         this->my_plane.check_frame_my_plane+=1;
         check_frame++;
     }
-    //Bullet part ends
-    }
+
+
+
+
 
     //Units printing part
     for (auto iter=items.begin(); iter!=items.end();)
@@ -188,7 +174,6 @@ void Screen_manager::print(int ch){ //ascii
 void Screen_manager::generate_event(){
     
     //Events Generation part
-    {   //num_event_occurec < 13 은 type_event의 index를 벗어나지 않기 위해 임의로 지정. 수정 필요.
     while (frame_event[num_event_occured] <= curr_frame)
     {   
         switch(type_event[num_event_occured]){
@@ -196,31 +181,26 @@ void Screen_manager::generate_event(){
             case 'n':{
                 enemy_1n* enemy_1 = new enemy_1n(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_1);
-                num_event_occured++;
                 break;
             }
             case 'r':{
                 enemy_2r* enemy_2 = new enemy_2r(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_2);
-                num_event_occured++;
                 break;
             }
             case 's':{
                 enemy_3s* enemy_3 = new enemy_3s(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_3);
-                num_event_occured++;
                 break;
             }
             case 'd':{
                 enemy_4d* enemy_4 = new enemy_4d(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_4);
-                num_event_occured++;
                 break;
             }
             case 'a':{
                 enemy_5a* enemy_5 = new enemy_5a(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_5);
-                num_event_occured++;
                 break;
             }
         
@@ -228,28 +208,23 @@ void Screen_manager::generate_event(){
             case 'P':{
                 Powerup_bullet* powerup_bullet = new Powerup_bullet(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 items.push_back(powerup_bullet);
-                num_event_occured++;
                 break;
             }
             case 'L':{
                 Levelup_bullet* levelup_bullet = new Levelup_bullet(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 items.push_back(levelup_bullet);
-                num_event_occured++;
                 break;
             }
-
             default:{
-                num_event_occured++;
                 break;
             }
-                
         }
-    }
-
+            num_event_occured++;   
+}
     //Each event is stored in proper vector.
     //Envents Generation part ends
-    }
 }
+
 
 void Screen_manager::interaction(){
     //between my_plane and enemies.
@@ -340,4 +315,6 @@ void Screen_manager::printend(){
     cout << "Your score is " << my_plane.score << "(n : " << my_plane.kills[0] <<\
     " , r : " << my_plane.kills[1] << " , s : " << my_plane.kills[2] << " , d : " << \
     my_plane.kills[3] << " , a : " << my_plane.kills[4] << ")" << endl;
+    cout << num_event_occured<< endl;
+    cout << my_plane.hp << endl;
 }
