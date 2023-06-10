@@ -8,12 +8,20 @@
 #include <conio.h>
 #include <chrono>
 #include <vector>
+
+#include "unit.h"
+
 #include "enemy.h"
 #include "enemy_1n.h"
 #include "enemy_2r.h"
 #include "enemy_3s.h"
 #include "enemy_4d.h"
 #include "enemy_5a.h"
+
+#include "item.h"
+#include "Levelup_bullet.h"
+#include "Powerup_bullet.h"
+
 #include "Screen_manager.h"
 
 using namespace std;
@@ -75,9 +83,10 @@ void Screen_manager::print_share(){
     }
 
     //Events Generation part
-    {
-    while ( frame_event[num_event_occured] <= curr_frame)
-    {
+    {   //num_event_occurec < 13 은 type_event의 index를 벗어나지 않기 위해 임의로 지정. 수정 필요.
+    while ( num_event_occured < 13 && frame_event[num_event_occured] <= curr_frame)
+    {   
+        
         switch(type_event[num_event_occured]){
             //enemies
             case 'n':{
@@ -113,24 +122,39 @@ void Screen_manager::print_share(){
         
             //items
             case 'P':{
+                Powerup_bullet* powerup_bullet = new Powerup_bullet(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
+                items.push_back(powerup_bullet);
                 num_event_occured++;
                 break;
             }
             case 'L':{
+                Levelup_bullet* levelup_bullet = new Levelup_bullet(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
+                items.push_back(levelup_bullet);
                 num_event_occured++;
                 break;
             }
-    }
 
+            default:{
+                num_event_occured++;
+                break;
+            }
+                
+        }
     }
 
     //Each event is stored in proper vector.
     //Envents Generation part ends
     }
-    //Enemy printing part
+    //Units printing part
+    for (auto iter=items.begin(); iter!=items.end();)
+    {
+        board[(**iter).y][(**iter).x] = (**iter).content;
+        iter++;
+    }
+
     for (auto iter=enemies.begin(); iter!=enemies.end();)
     {
-        if((**iter).x <= 0)
+        if((**iter).y <= 0 ||(**iter).x <= 0)
         {
             board[(**iter).y][(**iter).x]=' ';
             enemies.erase(iter);
@@ -140,10 +164,11 @@ void Screen_manager::print_share(){
             iter++;
         }
     }
-    //Enemy part ends
+    //Unit printing part ends
 
+    // Unit moving part
 
-
+    // Unit moving part ends
 }
 
 //print when key didn't pressed
@@ -185,4 +210,36 @@ void Screen_manager::print(int ch){ //ascii
     }
 
     print_share();
+}
+
+void Screen_manager::interaction(){
+    //between my_plane and enemies.
+    for (auto iter=enemies.begin(); iter!=enemies.end();){
+        if(((*iter)->y == this->my_plane.y) && ((*iter)->x == this->my_plane.x)){
+            this->my_plane.hp--;
+        }
+        iter++;
+    }
+    //between my_plane and Enemy_bullet
+
+
+    //between enemy and bullets
+    for(auto enem=enemies.begin(); enem !=enemies.end();){
+        for(auto iter=this->my_plane.bullet.begin(); iter<this->my_plane.bullet.end();){       
+            if( iter->x == (*enem)->x && iter->y == (*enem)->y){
+                (*enem)->hp -= iter->level;
+                this->my_plane.bullet.erase(iter); // 적에게 맞은 bullet은 사라짐.
+            }
+            else{
+                iter++;
+            }
+        }
+        if ((*enem)->hp<=0){
+            enemies.erase(enem);
+        }
+        else{
+        enem++;
+        }
+    }
+
 }

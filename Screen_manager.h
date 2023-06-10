@@ -12,7 +12,9 @@
 #include <chrono>
 #include <vector>
 #include "My_plane.h"
+#include "unit.h"
 #include "enemy.h"
+#include "item.h"
 
 using namespace std;
 
@@ -23,6 +25,7 @@ class Screen_manager{
         int curr_frame=0; //1frame=0.1sec
         int num_event_occured=0; //track the number of event occured _ 20230609
         std::vector<enemy*> enemies;
+        std::vector<item*> items;
 
         int y, x;
         int width=60;
@@ -34,6 +37,8 @@ class Screen_manager{
         void print();
         void print_share();
         void render();
+        
+        void interaction();
         char board[30][60]={'a'};
         My_plane my_plane = My_plane(height-2, 1, 0);
 };
