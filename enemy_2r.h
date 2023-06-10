@@ -6,8 +6,7 @@
 class enemy_2r: public enemy
 {
     public:
-    enemy_2r(int y_value, int x_value, int frame_value):enemy(y_value, x_value, frame_value, 5, 3, 2) {}
-    char content = 'r';
+    enemy_2r(int y_value, int x_value, int frame_value):enemy(y_value, x_value, frame_value, 5, 3, 2, 'r') {}
 
     private:
     

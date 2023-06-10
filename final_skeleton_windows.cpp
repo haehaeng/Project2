@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
 
     
     double operation_time=0; //microseconds
+    double delay_time=0;
     double frame_length = manager.frame_length;
 
     HANDLE consolehandle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -66,18 +67,34 @@ int main(int argc, char *argv[])
             //pause part
             if(ch=='p'){
                 while(1){
-                    if(_kbhit()) break;
+                if(_kbhit()){
+                    auto end_pause = std::chrono::system_clock::now();
+                    auto delay = std::chrono::duration_cast<std::chrono::microseconds>(end_pause-start);
+                    delay_time = delay.count();
+                    break;
+                    }
                 }
             }
-            //pause part ends
         }
+        
+            //pause part ends
         else{
             manager.print();
+        }
+
+        if(manager.num_event_occured != num_event){
+            manager.generate_event();
+        }
+        manager.interaction();
+        if(manager.check_finish(manager.num_event_occured == num_event)){
+            break;
         }
         auto end = std::chrono::system_clock::now();
         auto microsec = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
         int prev_frame = operation_time / frame_length;
-        //operation_time += (end-start);
+        //operation_time += (end-start) (excluding paused time);
+        operation_time -= delay_time;
+        delay_time = 0;
         operation_time += microsec.count();
         manager.curr_frame = operation_time / frame_length;
         
@@ -94,5 +111,7 @@ int main(int argc, char *argv[])
     }
     system("cls");
     std::cout<<"Start game~!"<<endl;
+    manager.printend();
+    
     return 0;
 }

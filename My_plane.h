@@ -23,8 +23,12 @@ class My_plane{
         int shot_frame_my_plane=1;
         int create_frame_my_plane; //initialize when it creates
         int check_frame_my_plane=0;
-        int hp=5;
         
+        int hp=5;
+        int score=0;
+        int kills[5]={0,};
+        int level = 1;
+        bool power = false;
         vector<Bullet> bullet;
 };
 #endif  

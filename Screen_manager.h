@@ -38,8 +38,12 @@ class Screen_manager{
         void print_share();
         void render();
         
+        void generate_event();
         void interaction();
+        bool check_finish(bool all_enemy);
         char board[30][60]={'a'};
+
+        void printend();
         My_plane my_plane = My_plane(height-2, 1, 0);
 };
 #endif

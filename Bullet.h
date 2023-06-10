@@ -21,5 +21,26 @@ class Bullet{
         int create_frame_bullet; //initialize when it creates
         int check_frame_bullet;
         int level=1;
+        bool power = false;
+        
+        char get_symbol(){
+            switch(this->level){
+                case 1:{
+                    return '\'';
+                    break;
+                }
+                case 2:{
+                    return '^';
+                    break;
+                }
+                case 3:{
+                    return '!';                        
+                    break;
+                }
+                default:
+                    return '\'';
+                    break;
+            }
+        }
 };
 #endif
