@@ -68,10 +68,11 @@ int main(int argc, char *argv[])
             if(ch=='p'){
                 while(1){
                 if(_kbhit()){
-                    ch = 0;
+    
                     auto end_pause = std::chrono::system_clock::now();
                     auto delay = std::chrono::duration_cast<std::chrono::microseconds>(end_pause-start);
                     delay_time = delay.count();
+
                     break;
                     }
                 }
