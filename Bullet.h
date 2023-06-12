@@ -43,4 +43,18 @@ class Bullet{
             }
         }
 };
+
+class Enemy_bullet{
+    public:
+    Enemy_bullet(int y_, int x_, int frame_, int enemy_frame_, int damage_, char enemy_type_, int moving_type_)\
+    : y(y_), x(x_), frame_value(frame_), enemy_frame_value(enemy_frame_), damage(damage_), enemy_type(enemy_type_), moving_type(moving_type_){}
+    int y, x;
+    int frame_value;
+    int enemy_frame_value;
+    int damage;
+    char enemy_type;
+    int moving_type; // 0 -> downward straight, 1 -> left diagonally. 2-> right diagonally
+    private:
+};
+
 #endif

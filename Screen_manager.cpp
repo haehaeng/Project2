@@ -103,58 +103,48 @@ void Screen_manager::print_share(){
     
     //Enemy_bullet printing part
 
-    for (auto iter=enemies.begin();iter!=enemies.end();iter++){
-        if((*iter)->content == 's')
-        {
-            for(auto bullet_it=(*(*iter)->Enemy_bullet).begin(); bullet_it<(*(*iter)->Enemy_bullet).end();)
-            {
-                if(bullet_it->y == 28){
-                    board[bullet_it->y][bullet_it->x]=' ';
-                    (*(*iter)->Enemy_bullet).erase(bullet_it);
-                }
-                else{
-                    board[bullet_it->y][bullet_it->x]=' ';
-                    bullet_it->y += 1;
-                    board[bullet_it->y][bullet_it->x]='*';
-                    bullet_it++;
-                }
-            }
-        }
-        else if((*iter)->content == 'd')
-        {
-            if((*iter)->x < 30){
-            for(auto bullet_it=(*(*iter)->Enemy_bullet).begin(); bullet_it<(*(*iter)->Enemy_bullet).end();)
-            {
-                if(bullet_it->y == 28 || bullet_it->x == 1){
-                    board[bullet_it->y][bullet_it->x]=' ';
-                    (*(*iter)->Enemy_bullet).erase(bullet_it);
-                }
-                else{
-                    board[bullet_it->y][bullet_it->x]=' ';
-                    bullet_it->y += 1;
-                    bullet_it->x -= 1;
-                    board[bullet_it->y][bullet_it->x]='*';
-                    bullet_it++;
-                }
-            }
+    for (auto iter=enemy_bullets.begin();iter!=enemy_bullets.end();){
+        switch(iter->moving_type){
+        case 0:
+            if(iter->y == 28){
+                board[iter->y][iter->x]=' ';
+                enemy_bullets.erase(iter);
             }
             else{
-            for(auto bullet_it=(*(*iter)->Enemy_bullet).begin(); bullet_it<(*(*iter)->Enemy_bullet).end();)
-            {
-                if(bullet_it->y == 28 || bullet_it->x == 58){
-                    board[bullet_it->y][bullet_it->x]=' ';
-                    (*(*iter)->Enemy_bullet).erase(bullet_it);
-                }
-                else{
-                    board[bullet_it->y][bullet_it->x]=' ';
-                    bullet_it->y += 1;
-                    bullet_it->x += 1;
-                    board[bullet_it->y][bullet_it->x]='*';
-                    bullet_it++;
-                }
+                board[iter->y][iter->x]=' ';
+                iter->y ++;
+                board[iter->y][iter->x]='*';
+                iter++;
             }
+            break;
+        case 1:
+            if(iter->y == 28||iter->x == 1){
+                board[iter->y][iter->x]=' ';
+                enemy_bullets.erase(iter);
             }
-            
+            else{
+                board[iter->y][iter->x]=' ';
+                iter->y +=1;
+                iter->x -=1;
+                board[iter->y][iter->x]='*';
+                iter++;
+            }
+            break;
+        case 2:
+            if(iter->y == 28 || iter->x == 58){
+                board[iter->y][iter->x]=' ';
+                enemy_bullets.erase(iter);
+            }
+            else{
+                board[iter->y][iter->x]=' ';
+                iter->y +=1;
+                iter->x +=1;
+                board[iter->y][iter->x]='*';
+                iter++;
+            }
+            break;
+
+
         }
         
     }
@@ -191,12 +181,18 @@ void Screen_manager::print_share(){
                 if((*iter)->y < height-2){
                     //Bullet Generation (after move)
                     if((((*iter)->content == 's')||(*iter)->content == 'S') && ((*iter)->y<height-3)){
-                        Bullet bullet = Bullet((*iter)->y+1, (*iter)->x, (*iter)->check_frame_enemy);
-                        (*(*iter)->Enemy_bullet).push_back(bullet);
+                        Enemy_bullet bullet = Enemy_bullet((*iter)->y+1, (*iter)->x, curr_frame, (*iter)->create_frame_enemy, (*iter)->damage, (*iter)->content,0);
+                        enemy_bullets.push_back(bullet);
                     }
                     if((((*iter)->content == 'd')||(*iter)->content == 'D') && ((*iter)->y<height-3)){
-                        Bullet bullet = Bullet((*iter)->y+1, (*iter)->x, (*iter)->check_frame_enemy);
-                        (*(*iter)->Enemy_bullet).push_back(bullet);   
+                        if((*iter)->x < 30){
+                        Enemy_bullet bullet = Enemy_bullet((*iter)->y+1, (*iter)->x, curr_frame, (*iter)->create_frame_enemy, (*iter)->damage, (*iter)->content,1);
+                        enemy_bullets.push_back(bullet);
+                        }   
+                        else{
+                        Enemy_bullet bullet = Enemy_bullet((*iter)->y+1, (*iter)->x, curr_frame, (*iter)->create_frame_enemy, (*iter)->damage, (*iter)->content,2);
+                        enemy_bullets.push_back(bullet);
+                        }
                     }
                     (*iter)->y+=1;
                     board[(*iter)->y][(*iter)->x] = (*iter)->content;
@@ -325,19 +321,13 @@ void Screen_manager::interaction(){
         iter++;
     }
     //between my_plane and Enemy_bullet
-    for (auto iter=enemies.begin(); iter!=enemies.end();iter++){
-        if((*iter)->speed!=0){
-            for(auto bullet_it = (*(*iter)->Enemy_bullet).begin(); bullet_it != (*(*iter)->Enemy_bullet).end();)
-            {
-                if(bullet_it->x == my_plane.x && bullet_it->y == my_plane.y)
-                {
-                    my_plane.hp -= bullet_it->damage;
-                    (*(*iter)->Enemy_bullet).erase(bullet_it);
-                }
-                else{
-                    bullet_it++;
-                }
-            }
+    for (auto iter=enemy_bullets.begin(); iter!=enemy_bullets.end();){
+        if(iter->x == my_plane.x && iter->y == my_plane.y){
+            my_plane.hp -= iter->damage;
+            enemy_bullets.erase(iter);
+        }
+        else{
+            iter++;
         }
     }
     //between my_plane and items

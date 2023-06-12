@@ -27,6 +27,7 @@ class Screen_manager{
         int num_event_occured=0; //track the number of event occured _ 20230609
         vector<enemy*> enemies;
         vector<item*> items;
+        vector<Enemy_bullet> enemy_bullets;
 
         int y, x;
         int width=60;
