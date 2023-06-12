@@ -8,7 +8,7 @@
 #include <conio.h>
 #include <chrono>
 #include <vector>
-
+#include <cctype>
 
 #include "unit.h"
 
@@ -23,6 +23,7 @@
 #include "item.h"
 #include "Levelup_bullet.h"
 #include "Powerup_bullet.h"
+#include "Heal_pack.h"
 
 #include "Screen_manager.h"
 
@@ -102,7 +103,6 @@ void Screen_manager::print_share(){
         check_frame++;
     
     //Enemy_bullet printing part
-
     for (auto iter=enemy_bullets.begin();iter!=enemy_bullets.end();){
         switch(iter->moving_type){
         case 0:
@@ -149,7 +149,6 @@ void Screen_manager::print_share(){
         
     }
     }   
-
 
     //Units printing part
     for (auto iter=items.begin(); iter!=items.end();)
@@ -211,6 +210,26 @@ void Screen_manager::print_share(){
     }
     // Unit moving part ends
 
+    // Unit buff
+    for (auto iter=enemies.begin(); iter!=enemies.end();iter++){
+        if ((*iter)->content =='a' || (*iter)->content == 'A')
+        {
+            while ((curr_frame-(*iter)->create_frame_enemy)/6 - (*iter)->check_frame_enemy > 0)
+            {
+                for (auto it = enemies.begin(); it != enemies.end(); it++){
+                    if((*it)->create_frame_enemy != (*iter)->create_frame_enemy){
+                        if((*it)->y-(*iter)->y<4 && (*iter)->y-(*it)->y <4){
+                            if((*it)->x-(*iter)->x<4 && (*iter)->x-(*it)->x <4){    
+                                (*it)->content = toupper((*it)->content);
+                                (*it)->damage ++;
+                            }
+                        }
+                    }
+                }
+                (*iter)->check_frame_enemy += 1;
+            }
+        }    
+    }
 
     //my_plane have to be printed always.
     board[this->my_plane.y][this->my_plane.x]='M';
@@ -300,6 +319,13 @@ void Screen_manager::generate_event(){
                 items.push_back(levelup_bullet);
                 break;
                 }
+            case 'H':{
+                Heal_pack* heal_pack = new Heal_pack(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
+                items.push_back(heal_pack);
+                break;
+            }
+
+
             default:{
                 break;
                 }
@@ -344,6 +370,10 @@ void Screen_manager::interaction(){
                     if(my_plane.level <3){
                     my_plane.level++;
                     }
+                    break;
+
+                case 'H':
+                    my_plane.hp += 3;
                     break;
                 default:
                     break;
@@ -392,6 +422,7 @@ void Screen_manager::interaction(){
         }
     }
 }
+
 bool Screen_manager::check_finish(bool all_enemy){
     if(this->my_plane.hp <= 0){
         return true;
@@ -409,5 +440,5 @@ void Screen_manager::printend(){
     cout << "Your score is " << my_plane.score << "(n : " << my_plane.kills[0] <<\
     " , r : " << my_plane.kills[1] << " , s : " << my_plane.kills[2] << " , d : " << \
     my_plane.kills[3] << " , a : " << my_plane.kills[4] << ")" << endl;
-    cout << my_plane.hp << endl;
+    cout << "Your hp is " << my_plane.hp << endl;
 }
