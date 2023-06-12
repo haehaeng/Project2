@@ -26,7 +26,7 @@ class My_plane{
         
         int hp=5;
         int score=0;
-        int kills[5]={0,};
+        int kills[6]={0,};
         int level = 1;
         bool power = false;
         vector<Bullet> bullet;

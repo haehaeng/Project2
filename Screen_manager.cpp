@@ -19,6 +19,7 @@
 #include "enemy_3s.h"
 #include "enemy_4d.h"
 #include "enemy_5a.h"
+#include "enemy_6b.h"
 
 #include "item.h"
 #include "Levelup_bullet.h"
@@ -67,6 +68,25 @@ void Screen_manager::print_share(){
         bullet.level = my_plane.level;
         bullet.power = my_plane.power;
         this->my_plane.bullet.push_back(bullet);
+        
+        //boss 'b' bullet create
+        for(auto iter = enemies.begin(); iter!=enemies.end();iter++)
+        {
+            if(tolower((*iter)->content) == 'b'){
+                Enemy_bullet bullet = Enemy_bullet((*iter)->y, (*iter)->x, curr_frame, (*iter)->create_frame_enemy, (*iter)->damage, (*iter)->content,0);
+                enemy_bullets.push_back(bullet);
+                if(check_frame%4==1 || check_frame%4==2){
+                    Enemy_bullet bullet = Enemy_bullet((*iter)->y, (*iter)->x-1, curr_frame, (*iter)->create_frame_enemy, (*iter)->damage, (*iter)->content,0);
+                    enemy_bullets.push_back(bullet);
+                }
+                else{
+                    Enemy_bullet bullet = Enemy_bullet((*iter)->y, (*iter)->x+1, curr_frame, (*iter)->create_frame_enemy, (*iter)->damage, (*iter)->content,0);
+                    enemy_bullets.push_back(bullet);
+                }
+                
+            }
+        }
+
 
         if(bullet.power){
             if(my_plane.x>1){
@@ -308,6 +328,11 @@ void Screen_manager::generate_event(){
                 enemies.push_back(enemy_5);
                 break;
                 }
+            case 'b':{
+                enemy_6b* enemy_6 = new enemy_6b(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
+                enemies.push_back(enemy_6);
+                break;
+                }
             //items
             case 'P':{
                 Powerup_bullet* powerup_bullet = new Powerup_bullet(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
@@ -384,6 +409,7 @@ void Screen_manager::interaction(){
         iter++;
         }
     }
+   
     //between enemy and bullets
     for(auto enem=enemies.begin(); enem !=enemies.end();){
         for(auto iter=this->my_plane.bullet.begin(); iter<this->my_plane.bullet.end();){       
@@ -396,7 +422,7 @@ void Screen_manager::interaction(){
             }
         }
         if ((*enem)->hp<=0){
-            switch((*enem)->content){
+            switch(tolower((*enem)->content)){
                 case 'n':
                     my_plane.kills[0]++;
                     break;
@@ -411,6 +437,9 @@ void Screen_manager::interaction(){
                     break;
                 case 'a':
                     my_plane.kills[4]++;
+                    break;
+                case 'b':
+                    my_plane.kills[5]++;
                     break;
             }
             my_plane.score += (*enem)->score;
@@ -439,6 +468,6 @@ bool Screen_manager::check_finish(bool all_enemy){
 void Screen_manager::printend(){
     cout << "Your score is " << my_plane.score << "(n : " << my_plane.kills[0] <<\
     " , r : " << my_plane.kills[1] << " , s : " << my_plane.kills[2] << " , d : " << \
-    my_plane.kills[3] << " , a : " << my_plane.kills[4] << ")" << endl;
+    my_plane.kills[3] << " , a : " << my_plane.kills[4] << " , b : " << my_plane.kills[5] << ")" << endl;
     cout << "Your hp is " << my_plane.hp << endl;
 }
