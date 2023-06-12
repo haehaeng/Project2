@@ -9,7 +9,9 @@
 #include <chrono>
 #include <vector>
 
+
 #include "unit.h"
+
 
 #include "enemy.h"
 #include "enemy_1n.h"
@@ -98,10 +100,65 @@ void Screen_manager::print_share(){
         }
         this->my_plane.check_frame_my_plane+=1;
         check_frame++;
+    
+    //Enemy_bullet printing part
+
+    for (auto iter=enemies.begin();iter!=enemies.end();iter++){
+        if((*iter)->content == 's')
+        {
+            for(auto bullet_it=(*(*iter)->Enemy_bullet).begin(); bullet_it<(*(*iter)->Enemy_bullet).end();)
+            {
+                if(bullet_it->y == 28){
+                    board[bullet_it->y][bullet_it->x]=' ';
+                    (*(*iter)->Enemy_bullet).erase(bullet_it);
+                }
+                else{
+                    board[bullet_it->y][bullet_it->x]=' ';
+                    bullet_it->y += 1;
+                    board[bullet_it->y][bullet_it->x]='*';
+                    bullet_it++;
+                }
+            }
+        }
+        else if((*iter)->content == 'd')
+        {
+            if((*iter)->x < 30){
+            for(auto bullet_it=(*(*iter)->Enemy_bullet).begin(); bullet_it<(*(*iter)->Enemy_bullet).end();)
+            {
+                if(bullet_it->y == 28 || bullet_it->x == 1){
+                    board[bullet_it->y][bullet_it->x]=' ';
+                    (*(*iter)->Enemy_bullet).erase(bullet_it);
+                }
+                else{
+                    board[bullet_it->y][bullet_it->x]=' ';
+                    bullet_it->y += 1;
+                    bullet_it->x -= 1;
+                    board[bullet_it->y][bullet_it->x]='*';
+                    bullet_it++;
+                }
+            }
+            }
+            else{
+            for(auto bullet_it=(*(*iter)->Enemy_bullet).begin(); bullet_it<(*(*iter)->Enemy_bullet).end();)
+            {
+                if(bullet_it->y == 28 || bullet_it->x == 58){
+                    board[bullet_it->y][bullet_it->x]=' ';
+                    (*(*iter)->Enemy_bullet).erase(bullet_it);
+                }
+                else{
+                    board[bullet_it->y][bullet_it->x]=' ';
+                    bullet_it->y += 1;
+                    bullet_it->x += 1;
+                    board[bullet_it->y][bullet_it->x]='*';
+                    bullet_it++;
+                }
+            }
+            }
+            
+        }
+        
     }
-
-
-
+    }   
 
 
     //Units printing part
@@ -113,7 +170,7 @@ void Screen_manager::print_share(){
 
     for (auto iter=enemies.begin(); iter!=enemies.end();)
     {
-        if((**iter).y <= 0 ||(**iter).x <= 0)
+        if((**iter).y >= 29 ||(**iter).x <= 0 )
         {
             board[(**iter).y][(**iter).x]=' ';
             enemies.erase(iter);
@@ -125,9 +182,42 @@ void Screen_manager::print_share(){
     }
     //Unit printing part ends
 
-    // Unit moving part
-
+    // Unit moving part & Enemy Bullet Creating
+    for (auto iter=enemies.begin(); iter!=enemies.end();){
+        bool erased = false;
+        if((*iter)->speed!=0){
+            while ((curr_frame-(*iter)->create_frame_enemy)/((*iter)->speed) - (*iter)->check_frame_enemy > 0){
+                board[(*iter)->y][(*iter)->x] = ' ';
+                if((*iter)->y < height-2){
+                    //Bullet Generation (after move)
+                    if((((*iter)->content == 's')||(*iter)->content == 'S') && ((*iter)->y<height-3)){
+                        Bullet bullet = Bullet((*iter)->y+1, (*iter)->x, (*iter)->check_frame_enemy);
+                        (*(*iter)->Enemy_bullet).push_back(bullet);
+                    }
+                    if((((*iter)->content == 'd')||(*iter)->content == 'D') && ((*iter)->y<height-3)){
+                        Bullet bullet = Bullet((*iter)->y+1, (*iter)->x, (*iter)->check_frame_enemy);
+                        (*(*iter)->Enemy_bullet).push_back(bullet);   
+                    }
+                    (*iter)->y+=1;
+                    board[(*iter)->y][(*iter)->x] = (*iter)->content;
+                    (*iter)->check_frame_enemy++;
+                }
+                else{
+                    enemies.erase(iter);
+                    erased = true;
+                    break;
+                }
+            }
+        }
+        if(!erased){
+            iter++;
+        }        
+    }
     // Unit moving part ends
+
+
+    //my_plane have to be printed always.
+    board[this->my_plane.y][this->my_plane.x]='M';
 }
 
 //print when key didn't pressed
@@ -174,7 +264,7 @@ void Screen_manager::print(int ch){ //ascii
 void Screen_manager::generate_event(){
     
     //Events Generation part
-    while (frame_event[num_event_occured] <= curr_frame)
+    while (frame_event[num_event_occured]!=0 && frame_event[num_event_occured] <= curr_frame)
     {   
         switch(type_event[num_event_occured]){
             //enemies
@@ -182,45 +272,44 @@ void Screen_manager::generate_event(){
                 enemy_1n* enemy_1 = new enemy_1n(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_1);
                 break;
-            }
+                }
             case 'r':{
                 enemy_2r* enemy_2 = new enemy_2r(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_2);
                 break;
-            }
+                }
             case 's':{
                 enemy_3s* enemy_3 = new enemy_3s(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_3);
                 break;
-            }
+                }
             case 'd':{
                 enemy_4d* enemy_4 = new enemy_4d(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_4);
                 break;
-            }
+                }
             case 'a':{
                 enemy_5a* enemy_5 = new enemy_5a(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 enemies.push_back(enemy_5);
                 break;
-            }
-        
+                }
             //items
             case 'P':{
                 Powerup_bullet* powerup_bullet = new Powerup_bullet(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 items.push_back(powerup_bullet);
                 break;
-            }
+                }
             case 'L':{
                 Levelup_bullet* levelup_bullet = new Levelup_bullet(y_event[num_event_occured], x_event[num_event_occured], frame_event[num_event_occured]);
                 items.push_back(levelup_bullet);
                 break;
-            }
+                }
             default:{
                 break;
-            }
+                }
         }
             num_event_occured++;   
-}
+    }
     //Each event is stored in proper vector.
     //Envents Generation part ends
 }
@@ -229,14 +318,28 @@ void Screen_manager::generate_event(){
 void Screen_manager::interaction(){
     //between my_plane and enemies.
     for (auto iter=enemies.begin(); iter!=enemies.end();){
+        //1 check per frame
         if(((*iter)->y == this->my_plane.y) && ((*iter)->x == this->my_plane.x)){
-            this->my_plane.hp-=1;
+            my_plane.hp--;
         }
         iter++;
     }
     //between my_plane and Enemy_bullet
-
-
+    for (auto iter=enemies.begin(); iter!=enemies.end();iter++){
+        if((*iter)->speed!=0){
+            for(auto bullet_it = (*(*iter)->Enemy_bullet).begin(); bullet_it != (*(*iter)->Enemy_bullet).end();)
+            {
+                if(bullet_it->x == my_plane.x && bullet_it->y == my_plane.y)
+                {
+                    my_plane.hp -= bullet_it->damage;
+                    (*(*iter)->Enemy_bullet).erase(bullet_it);
+                }
+                else{
+                    bullet_it++;
+                }
+            }
+        }
+    }
     //between my_plane and items
     for (auto iter=items.begin(); iter!=items.end();){
         if(((*iter)->y == this->my_plane.y) && ((*iter)->x == this->my_plane.x)){
@@ -291,6 +394,7 @@ void Screen_manager::interaction(){
                     break;
             }
             my_plane.score += (*enem)->score;
+            board[(*enem)->y][(*enem)->x] = ' ';
             enemies.erase(enem);
         }
         else{
@@ -315,6 +419,5 @@ void Screen_manager::printend(){
     cout << "Your score is " << my_plane.score << "(n : " << my_plane.kills[0] <<\
     " , r : " << my_plane.kills[1] << " , s : " << my_plane.kills[2] << " , d : " << \
     my_plane.kills[3] << " , a : " << my_plane.kills[4] << ")" << endl;
-    cout << num_event_occured<< endl;
     cout << my_plane.hp << endl;
 }

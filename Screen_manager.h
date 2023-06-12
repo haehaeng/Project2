@@ -16,6 +16,7 @@
 #include "enemy.h"
 #include "item.h"
 
+
 using namespace std;
 
 //Screen manager.
@@ -24,8 +25,8 @@ class Screen_manager{
         int frame_length=100000; //each frame's length == 0.1sec(10,000 microseconds)
         int curr_frame=0; //1frame=0.1sec
         int num_event_occured=0; //track the number of event occured _ 20230609
-        std::vector<enemy*> enemies;
-        std::vector<item*> items;
+        vector<enemy*> enemies;
+        vector<item*> items;
 
         int y, x;
         int width=60;

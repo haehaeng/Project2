@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
             if(ch=='p'){
                 while(1){
                 if(_kbhit()){
+                    ch = 0;
                     auto end_pause = std::chrono::system_clock::now();
                     auto delay = std::chrono::duration_cast<std::chrono::microseconds>(end_pause-start);
                     delay_time = delay.count();
@@ -77,16 +78,16 @@ int main(int argc, char *argv[])
             }
         }
         
-            //pause part ends
+        //pause part ends
         else{
             manager.print();
         }
 
-        if(manager.num_event_occured != num_event){
+        if(manager.num_event_occured < num_event){
             manager.generate_event();
         }
-        manager.interaction();
-        if(manager.check_finish(manager.num_event_occured == num_event)){
+
+        if(manager.check_finish(manager.num_event_occured >= num_event)){
             break;
         }
         auto end = std::chrono::system_clock::now();
@@ -106,6 +107,8 @@ int main(int argc, char *argv[])
         If you use multi-threading, you may print more frequently.
         You can reduce the execution time of manager.print() using multi-threading*/
         if(manager.curr_frame-prev_frame>0){
+            
+            manager.interaction();
             manager.render();
         }
     }
